@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#F7F3EA">
+<title>人生RPG</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-title" content="人生RPG">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700&family=DotGothic16&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F7F3EA; --card:#FFFDF8; --ink:#2A2A3A; --muted:#6B6878; --line:#E6DFCF;
+  --gold:#C8962E; --gold-soft:#F6EBD2; --indigo:#3D3F8F; --indigo-soft:#E7E7F6;
+  --work:#3D3F8F; --study:#2E7D6B; --body:#C25B3A; --money:#B8861F; --heart:#B0487A;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"M PLUS Rounded 1c",-apple-system,"Hiragino Sans",sans-serif;font-size:15px;line-height:1.6;color-scheme:light}
+button{font:inherit;color:inherit;cursor:pointer}
+.px{font-family:"DotGothic16","M PLUS Rounded 1c",monospace;letter-spacing:.02em}
+main{max-width:520px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 14px) 14px calc(env(safe-area-inset-bottom) + 92px)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin-bottom:12px}
+.label{font-size:12px;color:var(--muted);margin:0 0 6px}
+h2{font-size:17px;font-weight:700;margin:4px 2px 10px}
+h3{font-size:15px;font-weight:700;margin:0 0 6px}
+.row{display:flex;align-items:center;gap:12px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.bar{height:8px;border-radius:4px;background:#EFE8D8;overflow:hidden}
+.bar>i{display:block;height:100%;border-radius:4px;background:var(--gold);transition:width .5s}
+.hero .name{font-size:13px;color:var(--muted);margin:0}
+.hero .title{font-size:18px;font-weight:700;margin:0;line-height:1.35}
+.lv{display:inline-block;background:var(--ink);color:#FFF6DF;border-radius:6px;padding:0 7px;font-size:13px;margin-right:6px;vertical-align:2px}
+.wish{font-size:12px;color:var(--muted);border-top:1px dashed var(--line);margin-top:12px;padding-top:10px}
+.stat{background:#FBF7EE;border-radius:12px;padding:8px 10px}
+.stat p{margin:0}
+.stat .n{font-size:18px}
+.chip{display:inline-block;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:500}
+.act{display:flex;align-items:center;gap:8px;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;min-height:52px;font-size:13px;line-height:1.35;transition:transform .08s}
+.act:active{transform:scale(.97)}
+.act .em{font-size:20px;flex:none}
+.act.full{background:var(--gold-soft)}
+.goal{display:flex;gap:10px;align-items:flex-start;padding:8px 0}
+.goal .gd{flex:none;width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;border:1.5px solid var(--line);color:var(--muted)}
+.goal.done .gd{background:var(--gold);border-color:var(--gold);color:#fff}
+.goal.cur .gd{border-color:var(--ink);color:var(--ink)}
+.goal.later{opacity:.55}
+.goals{background:#FBF7EE;border-radius:12px;padding:6px 12px;margin:8px 0 10px}
+.big{width:100%;border:none;border-radius:14px;padding:14px;font-size:16px;font-weight:700;background:var(--ink);color:#FFF6DF;display:flex;align-items:center;justify-content:center;gap:8px}
+.ghost{background:transparent;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:13px}
+.filters{display:flex;gap:6px;overflow-x:auto;margin:0 -2px 10px;padding:2px}
+.filters button{flex:none;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:4px 12px;font-size:13px}
+.filters button.on{background:var(--ink);color:#FFF6DF;border-color:var(--ink)}
+nav{position:fixed;left:0;right:0;bottom:0;background:rgba(255,253,248,.96);border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:6px 0 calc(env(safe-area-inset-bottom) + 6px);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:10}
+nav button{background:none;border:none;display:flex;flex-direction:column;align-items:center;font-size:11px;color:var(--muted);padding:4px 14px;gap:1px}
+nav button .em{font-size:21px;filter:grayscale(1);opacity:.6}
+nav button.on{color:var(--ink);font-weight:700}
+nav button.on .em{filter:none;opacity:1}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 84px);transform:translateX(-50%) translateY(20px);background:var(--ink);color:#FFF6DF;border-radius:14px;padding:10px 16px;font-size:14px;opacity:0;transition:all .3s;z-index:60;max-width:90%;text-align:center;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast .xp{color:#F2C55C;font-family:"DotGothic16",monospace;margin-left:6px}
+.overlay{position:fixed;inset:0;background:rgba(30,28,40,.55);display:flex;align-items:center;justify-content:center;z-index:40;padding:20px}
+.modal{max-height:86vh;overflow-y:auto;background:var(--card);border-radius:20px;padding:22px 20px;width:100%;max-width:380px;text-align:center;animation:pop .25s ease-out}
+@keyframes pop{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+.timer{font-size:52px;margin:8px 0 2px}
+.night{background:#2E2D4D;color:#F1EEFF;border-radius:16px;padding:12px 14px;margin-bottom:12px;font-size:14px}
+.night small{color:#B9B4E0}
+.chap{display:flex;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.chap:first-of-type{border-top:none}
+.chap .dot{flex:none;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;border:2px solid var(--line);color:var(--muted);background:var(--card)}
+.chap.done .dot{background:var(--gold);border-color:var(--gold);color:#fff}
+.chap.cur .dot{border-color:var(--ink);color:var(--ink)}
+.chap.lock{opacity:.45}
+.task{display:flex;align-items:center;gap:8px;font-size:13px;padding:5px 0}
+.task .box{flex:none;width:22px;height:22px;border-radius:7px;border:1.5px solid #CFC5AE;display:flex;align-items:center;justify-content:center;font-size:13px;background:#fff}
+.task.ok .box{background:var(--gold);border-color:var(--gold);color:#fff}
+.task.ok span.t{color:var(--muted)}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.cal div{aspect-ratio:1;border-radius:7px;background:#F0EADC;font-size:10px;color:#A49C88;display:flex;align-items:flex-end;justify-content:flex-end;padding:3px}
+.log{display:flex;gap:10px;font-size:13px;padding:7px 0;border-top:1px solid var(--line)}
+.log:first-child{border-top:none}
+.opt{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.opt button{border:1.5px solid var(--line);background:var(--card);border-radius:10px;padding:5px 10px;font-size:13px;min-width:44px;min-height:36px}
+.opt button.on{border-color:var(--ink);background:var(--gold-soft)}
+.opt button.locked{opacity:.5}
+.opt .sw{width:30px;height:30px;border-radius:50%;padding:0!important;min-width:30px!important}
+input[type=text]{width:100%;border:1px solid var(--line);border-radius:10px;padding:9px 11px;font:inherit;font-size:16px;background:#fff}
+.fl{position:fixed;font-family:"DotGothic16",monospace;color:var(--gold);font-size:20px;pointer-events:none;z-index:50;animation:fl 0.9s ease-out forwards}
+@keyframes fl{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-50px)}}
+.muted{color:var(--muted)}
+.sm{font-size:12px}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<nav id="nav">
+  <button data-tab="home" class="on"><span class="em">🏠</span>ホーム</button>
+  <button data-tab="quest"><span class="em">🗺️</span>クエスト</button>
+  <button data-tab="log"><span class="em">📜</span>記録</button>
+  <button data-tab="me"><span class="em">🧑</span>自分</button>
+</nav>
+<div class="toast" id="toast"></div>
+<div id="layer"></div>
+
+<script>
+const G = {
+  work:{name:'仕事',em:'💼',c:'var(--work)',soft:'#E7E7F6'},
+  study:{name:'学び',em:'📘',c:'var(--study)',soft:'#DFF1EC'},
+  body:{name:'体',em:'💪',c:'var(--body)',soft:'#F8E4DC'},
+  money:{name:'お金',em:'🪙',c:'var(--money)',soft:'#F6EBD2'},
+  heart:{name:'心',em:'🌙',c:'var(--heart)',soft:'#F5E1EB'}
+};
+const ACTIONS = [
+  {id:'t_java',g:'study',em:'⏱️',label:'2分だけJava',timer:true},
+  {id:'java_q',g:'study',em:'✏️',label:'問題を1問解いた',tag:'java'},
+  {id:'java_b',g:'study',em:'📖',label:'教科書を開いた',tag:'java'},
+  {id:'stretch',g:'body',em:'🧘',label:'ストレッチ30秒',tag:'stretch'},
+  {id:'meal',g:'body',em:'🪥',label:'食後すぐ横にならなかった',tag:'meal'},
+  {id:'move',g:'body',em:'🏋️',label:'筋トレ・歩いた',tag:'move'},
+  {id:'sleep',g:'body',em:'🌙',label:'2時前に寝た',tag:'sleep'},
+  {id:'notice',g:'heart',em:'⚖️',label:'引きずりに気づけた（閉廷）',tag:'notice'},
+  {id:'receive',g:'heart',em:'🎁',label:'好意を受け取れた',tag:'receive'},
+  {id:'metime',g:'heart',em:'☕',label:'自分の時間をとった',tag:'metime'},
+  {id:'money',g:'money',em:'📊',label:'積立・家計を確認した',tag:'money'},
+  {id:'save',g:'money',em:'🐷',label:'衝動買いを見送った',tag:'save'},
+  {id:'boundary',g:'work',em:'🛡️',label:'線を引けた・断れた',tag:'boundary'},
+  {id:'career',g:'work',em:'🔎',label:'転職の情報を1つ見た',tag:'career'}
+];
+const QUESTS = {
+  work:{title:'SE転職の旅（メイン）',chapters:[
+    {name:'Java Silverの試練',tasks:[{id:'w1a',t:'試験日を決めた'},{id:'w1b',t:'試験を申し込んだ'},{id:'w1c',t:'Java Silverに合格した'}]},
+    {name:'ポートフォリオの森',tasks:[{id:'w2a',t:'このアプリの設計をまとめた'},{id:'w2b',t:'作品をGitHubに公開した'},{id:'w2c',t:'作品の説明を書いた'}]},
+    {name:'転職の門',tasks:[{id:'w3a',t:'職務経歴書を書いた'},{k:'career',n:10,t:'転職の情報を累計10回見た'},{id:'w3c',t:'1社に応募した'}]},
+    {name:'南の拠点',tasks:[{id:'w4a',t:'鹿児島在住×福岡リモートの求人を見つけた'},{id:'w4b',t:'SEとして内定した'}]},
+    {name:'自分の城',tasks:[{id:'w5a',t:'法人化の情報を調べた'},{id:'w5b',t:'副収入の柱を1つ作った'}]}
+  ]},
+  study:{title:'Java Silver攻略',chapters:[
+    {name:'データ型と演算子',tasks:[{id:'s1a',t:'1周目：教科書を見ながら解いた'},{id:'s1b',t:'2周目：教科書を見ながら解いた'},{id:'s1c',t:'見ずに解けた'}]},
+    {name:'制御構文と配列',tasks:[{id:'s2a',t:'1周目：教科書を見ながら解いた'},{id:'s2b',t:'2周目：教科書を見ながら解いた'},{id:'s2c',t:'見ずに解けた'}]},
+    {name:'クラスとオブジェクト',tasks:[{id:'s3a',t:'1周目：教科書を見ながら解いた'},{id:'s3b',t:'2周目：教科書を見ながら解いた'},{id:'s3c',t:'見ずに解けた'}]},
+    {name:'継承とポリモーフィズム',tasks:[{id:'s4a',t:'1周目：教科書を見ながら解いた'},{id:'s4b',t:'2周目：教科書を見ながら解いた'},{id:'s4c',t:'見ずに解けた'}]},
+    {name:'例外・ラムダ・API',tasks:[{id:'s5a',t:'1周目：教科書を見ながら解いた'},{id:'s5b',t:'2周目：教科書を見ながら解いた'},{id:'s5c',t:'見ずに解けた'}]},
+    {name:'模擬試験',tasks:[{id:'s6a',t:'模擬試験を1回解いた'},{id:'s6b',t:'模擬試験で合格ラインを超えた'}]}
+  ]},
+  body:{title:'引き締まった、男らしく色気のある体へ',chapters:[
+    {name:'腰をいたわる',tasks:[{id:'b1a',t:'膝下クッションを用意した'},{k:'stretch',n:10,t:'ストレッチ 累計10回'}]},
+    {name:'眠りを整える',tasks:[{k:'sleep',n:7,t:'2時前に寝た 累計7回'},{k:'meal',n:7,t:'食後すぐ横にならなかった 累計7回'}]},
+    {name:'動ける体',tasks:[{k:'move',n:15,t:'筋トレ・歩いた 累計15回'},{k:'stretch',n:30,t:'ストレッチ 累計30回'}]},
+    {name:'引き締まる体',tasks:[{k:'move',n:40,t:'筋トレ・歩いた 累計40回'},{id:'b4b',t:'着たい服を1着決めた'}]},
+    {name:'理想の体',tasks:[{k:'move',n:80,t:'筋トレ・歩いた 累計80回'},{id:'b5b',t:'鏡の自分に「いいじゃん」と思えた'}]}
+  ]},
+  money:{title:'守れる土台づくり',chapters:[
+    {name:'家計を知る',tasks:[{k:'money',n:4,t:'積立・家計を確認 累計4回'},{id:'m1b',t:'現金キープの目標額を決めた'}]},
+    {name:'余裕の上乗せ',tasks:[{k:'save',n:5,t:'衝動買いを見送った 累計5回'},{id:'m2b',t:'余裕月に積立を上乗せした'}]},
+    {name:'たまの贅沢',tasks:[{id:'m3a',t:'罪悪感なく自分にご褒美を買った'}]}
+  ]},
+  heart:{title:'自分を認める旅',chapters:[
+    {name:'裁判を止める',tasks:[{k:'notice',n:10,t:'引きずりに気づけた 累計10回'}]},
+    {name:'受け取る練習',tasks:[{k:'receive',n:5,t:'好意を受け取れた 累計5回'}]},
+    {name:'自分を満たす',tasks:[{k:'metime',n:10,t:'自分の時間をとった 累計10回'}]},
+    {name:'素のままで',tasks:[{id:'h4a',t:'情けないところを見せられた'},{k:'notice',n:30,t:'引きずりに気づけた 累計30回'}]}
+  ]}
+};
+const TITLES = ['電気工事士','見習いSE','作品を持つ見習いSE','SE','場所に縛られないSE','自分の人生を生きる者'];
+const OUTFITS = [
+  {id:'work',name:'作業着'},
+  {id:'hoodie',name:'パーカー'},
+  {id:'jacket',name:'ジャケット',need:'仕事 第1章クリア',ok:s=>clearedCount(s,'work')>=1},
+  {id:'cape',name:'なりたい自分の外套',need:'Lv.10',ok:s=>level(totalXP(s))>=10}
+];
+const SKINS=['#F6D7B8','#E8B98E','#C98E62'];
+const HAIRC=['#2B2321','#5A3A22','#8A6A4A','#C9A227'];
+const HAIRS=[{id:'short',name:'短髪'},{id:'spiky',name:'ツンツン'},{id:'side',name:'サイド'}];
+const PRAISE=['できた。それが事実。','小さな一歩、ちゃんと刻まれた。','昨日の自分より、一歩先。','動いた時点で勝ち。','積み重ねが、装備になっていく。','やる気は後から来る。もう来てるかも。','ちゃんとやれてる。'];
+const LIMIT={java_q:10,java_b:1,stretch:3,meal:3,move:2,sleep:1,notice:5,receive:3,metime:2,money:1,save:3,boundary:3,career:3};
+function defaultActions(){return ACTIONS.map(a=>Object.assign({},a,{lim:a.timer?0:(LIMIT[a.id]||0)}))}
+const LIM_OPTS=[1,2,3,5,10,0];
+const STAGE_NAMES=['段階1','段階2','段階3'];
+function defaultGoals(){return {
+  work:['Java Silverに合格する','SEとして転職する','鹿児島在住×福岡リモートで年収700万'],
+  study:['教科書を見ながら全章を1周する','教科書を見ずに解けるようになる','Java Silverに合格する'],
+  body:['腰痛を気にせず動ける','体が締まってきたと実感できる','引き締まった、男らしく色気のある体'],
+  money:['現金キープの目標額を貯める','余裕月に上乗せできる家計','家族を守れる資産の土台'],
+  heart:['自分のできたを数えられる','好意を素直に受け取れる','素のままの自分でいられる']
+ }}
+function goalsOf(g){return (S.goals[g]||[]).map(x=>typeof x==='string'?{t:x}:x)}
+const PRAISE_NOTICE=['気づけた。それで十分。','裁判、閉廷。','流していい。あなたは十分やってる。'];
+
+const KEY='lifeRpg_v1';
+let mem=null;
+function load(){try{const r=localStorage.getItem(KEY);if(r)return JSON.parse(r)}catch(e){}return mem}
+function save(){mem=S;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function fresh(){return {started:false,name:'',avatar:{skin:0,hair:'short',hc:0,outfit:'work'},logs:[],done:{},cleared:[],goals:defaultGoals(),actions:defaultActions(),bodyGoal:'引き締まった、男らしく色気のある体',night:true}}
+let S=load()||fresh();
+if(!S.goals)S.goals=defaultGoals();
+if(!S.actions)S.actions=defaultActions();
+for(const g in S.goals)S.goals[g]=S.goals[g].map(x=>typeof x==='string'?{t:x}:x);
+let lastUndo=null;
+function todayCount(id){const t0=startOfDay(Date.now());return S.logs.filter(l=>l.a===id&&l.t>=t0).length}
+let tab='home', filter='all';
+
+const DAY=86400000;
+function dkey(t){const d=new Date(t);return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()}
+function startOfDay(t){const d=new Date(t);d.setHours(0,0,0,0);return d.getTime()}
+function weekStart(t){const d=new Date(startOfDay(t));const w=(d.getDay()+6)%7;return d.getTime()-w*DAY}
+function level(xp){return Math.floor(Math.sqrt(xp/20))+1}
+function lvBase(l){return 20*(l-1)*(l-1)}
+function glevel(xp){return Math.floor(Math.sqrt(xp/10))+1}
+function totalXP(s){return s.logs.reduce((a,l)=>a+l.xp,0)}
+function gXP(s,g){return s.logs.filter(l=>l.g===g).reduce((a,l)=>a+l.xp,0)}
+function tagCount(s,k){return s.logs.filter(l=>l.tag===k).length}
+function taskDone(s,t){return t.k?tagCount(s,t.k)>=t.n:!!s.done[t.id]}
+function chapDone(s,c){return c.tasks.every(t=>taskDone(s,t))}
+function curChap(s,g){const ch=QUESTS[g].chapters;for(let i=0;i<ch.length;i++)if(!chapDone(s,ch[i]))return i;return ch.length}
+function clearedCount(s,g){return curChap(s,g)}
+function titleOf(s){return TITLES[Math.min(clearedCount(s,'work'),TITLES.length-1)]}
+function esc(x){return String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function pick(a){return a[Math.floor(Math.random()*a.length)]}
+
+function seed(){
+  const s=fresh();s.started=true;
+  let r=7;const rnd=()=>{r=(r*9301+49297)%233280;return r/233280};
+  const now=Date.now();
+  const pool=['java_q','java_b','stretch','meal','move','sleep','notice','metime','money','stretch','java_q','receive','career','save'];
+  for(let d=20;d>=1;d--){
+    const n=rnd()<0.2?0:1+Math.floor(rnd()*3);
+    for(let i=0;i<n;i++){
+      const pid=pool[Math.floor(rnd()*pool.length)];
+      const a=ACTIONS.find(x=>x.id===pid);
+      s.logs.push({t:startOfDay(now-d*DAY)+(13+Math.floor(rnd()*10))*3600000,a:pid,g:a.g,label:a.label,tag:a.tag,xp:10});
+    }
+  }
+  s.done={s1a:1,s1b:1};
+  s.cleared=allCleared(s);
+  return s;
+}
+function allCleared(s){const out=[];for(const g in QUESTS){const n=curChap(s,g);for(let i=0;i<n;i++)out.push(g+i)}return out}
+
+function addLog(entry){
+  const beforeLv=level(totalXP(S));const n0=S.logs.length;
+  S.logs.push(Object.assign({t:Date.now()},entry));
+  const newly=allCleared(S).filter(k=>!S.cleared.includes(k));
+  newly.forEach(k=>{S.cleared.push(k);const g=k.replace(/\d+$/,''),i=+k.match(/\d+$/)[0];
+    S.logs.push({t:Date.now(),g,label:'「'+QUESTS[g].chapters[i].name+'」クリア',tag:'clear',xp:50})});
+  lastUndo={n:S.logs.length-n0,cleared:newly};
+  save();
+  const afterLv=level(totalXP(S));
+  const queue=[];
+  newly.forEach(k=>{const g=k.replace(/\d+$/,''),i=+k.match(/\d+$/)[0];queue.push({type:'clear',g,i})});
+  if(afterLv>beforeLv)queue.push({type:'lv',lv:afterLv});
+  render();
+  showQueue(queue);
+}
+function showQueue(q){if(!q.length)return;const m=q.shift();
+  if(m.type==='clear'){
+    const ch=QUESTS[m.g].chapters;const next=ch[m.i+1];
+    const extra=m.g==='work'?'<p class="sm">称号が「'+esc(TITLES[Math.min(m.i+1,TITLES.length-1)])+'」になった</p>':'';
+    modal('<p class="px" style="font-size:13px;color:var(--gold);margin:0">CHAPTER CLEAR</p><div style="font-size:44px">🏆</div><h3>'+G[m.g].em+' 第'+(m.i+1)+'章「'+esc(ch[m.i].name)+'」</h3><p class="sm muted">ボーナス <span class="px" style="color:var(--gold)">+50 EXP</span></p>'+extra+(next?'<p class="sm">次の章：'+esc(next.name)+'</p>':'<p class="sm">このクエストラインを全てクリアした</p>'),()=>showQueue(q));
+  } else {
+    modal('<p class="px" style="font-size:13px;color:var(--gold);margin:0">LEVEL UP</p><div class="px" style="font-size:54px;margin:6px 0">Lv.'+m.lv+'</div><p class="sm">'+esc(pick(['また一つ、なりたい自分に近づいた。','積み上げた分だけ、ちゃんと強くなってる。']))+'</p>',()=>showQueue(q));
+  }
+}
+function modal(html,onClose,btn){
+  const L=document.getElementById('layer');
+  L.innerHTML='<div class="overlay"><div class="modal">'+html+'<button class="big" id="mclose" style="margin-top:14px">'+(btn||'OK')+'</button></div></div>';
+  document.getElementById('mclose').onclick=()=>{L.innerHTML='';onClose&&onClose()};
+}
+function toast(msg,xp,undo){const t=document.getElementById('toast');t.innerHTML=esc(msg)+(xp?'<span class="xp">+'+xp+' EXP</span>':'')+(undo?'<button id="undoBtn" style="margin-left:10px;background:none;border:1px solid #8C88A8;color:#FFF6DF;border-radius:8px;padding:2px 8px;font-size:12px">取り消す</button>':'');t.style.pointerEvents=undo?'auto':'none';t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>{t.classList.remove('show');t.style.pointerEvents='none'},undo?4000:2000);
+  const u=document.getElementById('undoBtn');if(u)u.onclick=()=>{if(lastUndo){S.logs.splice(S.logs.length-lastUndo.n,lastUndo.n);S.cleared=S.cleared.filter(k=>!lastUndo.cleared.includes(k));lastUndo=null;save();render()}t.classList.remove('show');t.style.pointerEvents='none'}}
+function floatXP(el,xp){if(!el)return;const r=el.getBoundingClientRect();const f=document.createElement('div');f.className='fl';f.textContent='+'+xp;f.style.left=(r.left+r.width/2-16)+'px';f.style.top=(r.top-4)+'px';document.body.appendChild(f);setTimeout(()=>f.remove(),900)}
+
+function avatar(a,size){
+  const sk=SKINS[a.skin],hc=HAIRC[a.hc];
+  const hair={
+    short:'<path d="M29 41 Q28 17 50 16 Q72 17 71 41 Q68 29 50 28 Q33 29 29 41Z" fill="'+hc+'"/>',
+    spiky:'<path d="M29 41 L30 24 L37 28 L40 15 L47 25 L52 12 L57 25 L64 16 L66 28 L71 24 L71 41 Q66 30 50 29 Q34 30 29 41Z" fill="'+hc+'"/>',
+    side:'<path d="M29 43 Q27 16 52 16 Q73 18 71 40 Q66 26 44 30 Q36 33 29 43Z" fill="'+hc+'"/>'
+  }[a.hair];
+  let body='',back='';
+  if(a.outfit==='work'){body='<path d="M22 100 Q24 70 50 68 Q76 70 78 100Z" fill="#D9762F"/><rect x="25" y="84" width="50" height="5" fill="#E9E6DD"/><path d="M44 68 L50 78 L56 68Z" fill="#B85E22"/>'}
+  if(a.outfit==='hoodie'){body='<path d="M22 100 Q24 70 50 68 Q76 70 78 100Z" fill="#6E7A8A"/><path d="M38 68 Q50 80 62 68" fill="none" stroke="#56606E" stroke-width="4"/><line x1="46" y1="74" x2="45" y2="86" stroke="#E9E6DD" stroke-width="1.5"/><line x1="54" y1="74" x2="55" y2="86" stroke="#E9E6DD" stroke-width="1.5"/>'}
+  if(a.outfit==='jacket'){body='<path d="M22 100 Q24 70 50 68 Q76 70 78 100Z" fill="#2F3560"/><path d="M42 68 L50 100 L58 68Z" fill="#F4F1EA"/><path d="M48 74 L50 72 L52 74 L51 90 L50 92 L49 90Z" fill="#C8962E"/>'}
+  if(a.outfit==='cape'){back='<path d="M18 100 Q20 66 50 64 Q80 66 82 100Z" fill="#4B2F6E"/>';body='<path d="M27 100 Q28 72 50 70 Q72 72 73 100Z" fill="#2F3560"/><path d="M42 70 L50 100 L58 70Z" fill="#F4F1EA"/><circle cx="50" cy="70" r="3.5" fill="#C8962E"/>'}
+  return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 100 100" style="flex:none;border-radius:50%;background:#EFE6D2"><clipPath id="cp'+size+'"><circle cx="50" cy="50" r="50"/></clipPath><g clip-path="url(#cp'+size+')">'+back+'<rect x="44" y="56" width="12" height="14" fill="'+sk+'"/>'+body+'<circle cx="50" cy="42" r="21" fill="'+sk+'"/>'+hair+'<ellipse cx="42.5" cy="44" rx="2" ry="2.6" fill="#2A2A3A"/><ellipse cx="57.5" cy="44" rx="2" ry="2.6" fill="#2A2A3A"/><path d="M44 52 Q50 56.5 56 52" fill="none" stroke="#2A2A3A" stroke-width="1.8" stroke-linecap="round"/></g></svg>';
+}
+
+function weekCounts(){const ws=weekStart(Date.now());const real=S.logs.filter(l=>l.tag!=='clear');
+  return {now:real.filter(l=>l.t>=ws).length,prev:real.filter(l=>l.t>=ws-7*DAY&&l.t<ws).length}}
+
+function nightBanner(force){
+  const h=new Date().getHours(),m=new Date().getMinutes();
+  if(!S.night&&!force)return '';
+  let msg='';
+  if(force||(h===0&&m>=30)||h===1)msg='<b>🌙 2時の壁が近いよ</b><br><small>今日のできたはもう十分。今寝れば、明日の自分が喜ぶ。</small>';
+  else if(h>=2&&h<5)msg='<b>🌙 起きてても大丈夫</b><br><small>責めなくていい。横になって目を閉じるだけでも、ちゃんと休めてる。</small>';
+  return msg?'<div class="night">'+msg+'</div>':'';
+}
+
+function renderHome(){
+  if(!S.started){
+    return '<div class="card" style="text-align:center;padding:24px 18px">'+avatar(S.avatar,96)+'<h3 style="margin-top:12px">人生RPGへようこそ</h3><p class="sm muted">叱らない、認める自己管理。×はどこにもありません。</p><p class="label" style="margin-top:12px;text-align:left">あなたの名前（呼ばれたい名前）</p><input type="text" id="startName" placeholder="いっせい"><p class="sm" id="startErr" style="color:#B3261E;margin:4px 0 0;min-height:1em"></p><button class="big" data-act="start" style="margin-top:8px">冒険を始める</button><p class="sm muted" style="margin:10px 0 0">バックアップがある場合は「自分」タブから復元できます。</p></div>';
+  }
+  const xp=totalXP(S),lv=level(xp),base=lvBase(lv),next=lvBase(lv+1);
+  const wc=weekCounts();
+  const wcMsg=wc.now>=wc.prev?'先週より +'+(wc.now-wc.prev):'今週も '+wc.now+'回 積み上げ中';
+  const wi=curChap(S,'work'),wch=QUESTS.work.chapters;
+  const wcur=wch[Math.min(wi,wch.length-1)];
+  const wdone=wcur.tasks.filter(t=>taskDone(S,t)).length;
+  const acts=S.actions.filter(a=>filter==='all'||a.g===filter);
+  return nightBanner()+
+  '<div class="card hero"><div class="row">'+avatar(S.avatar,72)+'<div style="flex:1;min-width:0"><p class="name">'+esc(S.name)+'</p><p class="title"><span class="lv px">Lv.'+lv+'</span>'+esc(titleOf(S))+'</p><div class="bar" style="margin-top:6px"><i style="width:'+Math.round((xp-base)/(next-base)*100)+'%"></i></div><p class="sm muted" style="margin:3px 0 0">次のLvまで '+(next-xp)+' EXP</p></div></div>'+
+  '<div class="grid2" style="margin-top:12px"><div class="stat"><p class="sm muted">累計できた</p><p class="n px">'+S.logs.filter(l=>l.tag!=='clear').length+'回</p></div><div class="stat"><p class="sm muted">今週</p><p class="n px">'+wc.now+'回</p><p class="sm" style="color:var(--study)">'+wcMsg+'</p></div></div>'+
+  '<p class="wish">目指す場所：自分の人生を、自分で生きる</p></div>'+
+  '<div class="card" data-act="goquest" style="cursor:pointer"><p class="label">💼 メインクエスト「SE転職の旅」</p>'+(()=>{const gl=goalsOf('work'),i=gl.findIndex(x=>!x.d);return i<0?'<p class="sm" style="margin:0 0 4px;color:var(--gold)">★ 3段階すべて叶えた</p>':'<p class="sm" style="margin:0 0 4px"><span class="chip" style="background:var(--gold-soft);color:#7A5A12">'+STAGE_NAMES[i]+'</span> '+esc(gl[i].t)+'</p>'})()+'<h3>'+(wi>=wch.length?'全章クリア':'第'+(wi+1)+'章 '+esc(wcur.name))+'</h3><div class="bar"><i style="width:'+Math.round(wdone/wcur.tasks.length*100)+'%;background:var(--work)"></i></div><p class="sm muted" style="margin:6px 0 0">'+wdone+' / '+wcur.tasks.length+' 達成'+(wch[wi+1]?'・次の章：'+esc(wch[wi+1].name):'')+'</p></div>'+
+  '<button class="big" data-act="timer" style="margin-bottom:12px">⏱️ 2分だけやってみる</button>'+
+  '<div class="row" style="justify-content:space-between;margin:4px 2px 10px"><h2 style="margin:0">今日のできた <span class="sm muted" style="font-weight:400">タップで記録</span></h2><button class="ghost" data-act="editActs" style="flex:none;padding:4px 12px">編集</button></div>'+
+  '<div class="filters"><button data-f="all" class="'+(filter==='all'?'on':'')+'">すべて</button>'+Object.keys(G).map(g=>'<button data-f="'+g+'" class="'+(filter===g?'on':'')+'">'+G[g].em+' '+G[g].name+'</button>').join('')+'</div>'+
+  '<div class="grid2">'+acts.map(a=>{const c=todayCount(a.id),lim=a.lim,full=lim&&c>=lim;return '<button class="act'+(full?' full':'')+'" data-a="'+a.id+'" style="border-left:4px solid '+G[a.g].c+'"><span class="em">'+(full?'✅':a.em)+'</span><span style="flex:1">'+esc(a.label)+(c&&lim?'<br><span class="px" style="font-size:11px;color:var(--muted)">今日 '+c+'/'+lim+'</span>':'')+'</span></button>'}).join('')+'</div>'+
+  '<div class="card" style="margin-top:12px"><p class="label">自由にできたを書く</p><div class="row"><input type="text" id="freeTxt" placeholder="洗い物を片付けた"><button class="ghost" data-act="free" style="flex:none">記録</button></div></div>'+
+  '<h2 style="margin-top:6px">ステータス</h2><div class="grid2">'+Object.keys(G).map(g=>{const x=gXP(S,g),l=glevel(x),b=10*(l-1)*(l-1),n=10*l*l;return '<div class="stat"><p class="sm" style="color:'+G[g].c+'">'+G[g].em+' '+G[g].name+'</p><p class="n px">Lv.'+l+'</p><div class="bar"><i style="width:'+Math.round((x-b)/(n-b)*100)+'%;background:'+G[g].c+'"></i></div></div>'}).join('')+'</div>';
+}
+
+function renderQuest(){
+  return '<h2>クエスト</h2><p class="sm muted" style="margin:-6px 2px 12px">毎日の「できた」が、そのままクエストを進めます。</p>'+
+  ['work','study','body','money','heart'].map(g=>{
+    const q=QUESTS[g],ci=curChap(S,g);
+    const gl=goalsOf(g),gc=gl.findIndex(x=>!x.d);
+    const goalsHtml='<div class="goals"><div class="row" style="justify-content:space-between"><span class="sm" style="font-weight:700">目標の3段階</span><button class="ghost" data-goaledit="'+g+'" style="padding:3px 10px;font-size:12px">編集</button></div>'+gl.map((x,i)=>{const st=x.d?'done':i===gc?'cur':'later';const dd=x.d?new Date(x.d):null;
+      return '<div class="goal '+st+'"><span class="gd px">'+(x.d?'★':i+1)+'</span><div style="flex:1"><p class="sm muted" style="margin:0">'+STAGE_NAMES[i]+(dd?'・'+(dd.getMonth()+1)+'/'+dd.getDate()+' 叶えた':'')+'</p><p style="margin:0;font-size:14px;'+(st==='cur'?'font-weight:700':'')+'">'+esc(x.t)+'</p></div>'+(st==='cur'?'<button class="ghost" data-goalok="'+g+':'+i+'" style="flex:none;padding:4px 10px;font-size:12px;border-color:var(--gold)">叶えた</button>':'')+'</div>'}).join('')+'</div>';
+    return '<div class="card"><p class="label" style="color:'+G[g].c+'">'+G[g].em+' '+G[g].name+'</p><h3>'+esc(q.title)+'</h3>'+goalsHtml+'<p class="sm muted" style="margin:0 0 2px">そこへ向かう章</p>'+
+    q.chapters.map((c,i)=>{
+      const st=i<ci?'done':i===ci?'cur':'lock';
+      let inner='';
+      if(st==='cur')inner=c.tasks.map(t=>{const ok=taskDone(S,t);
+        if(t.k){const n=Math.min(tagCount(S,t.k),t.n);return '<div class="task'+(ok?' ok':'')+'"><span class="box">'+(ok?'✓':'')+'</span><span class="t" style="flex:1">'+esc(t.t)+'</span><span class="px sm muted">'+n+'/'+t.n+'</span></div>'}
+        return '<div class="task'+(ok?' ok':'')+'" data-task="'+t.id+'" style="cursor:pointer"><span class="box">'+(ok?'✓':'')+'</span><span class="t">'+esc(t.t)+'</span></div>'}).join('');
+      return '<div class="chap '+st+'"><span class="dot px">'+(st==='done'?'★':i+1)+'</span><div style="flex:1"><p style="margin:2px 0 2px;font-weight:'+(st==='cur'?700:400)+'">'+(st==='lock'?'？？？':esc(c.name))+'</p>'+inner+'</div></div>';
+    }).join('')+'</div>';
+  }).join('');
+}
+
+function renderLog(){
+  const real=S.logs.filter(l=>l.tag!=='clear');
+  const today=startOfDay(Date.now());
+  const counts={};real.forEach(l=>{const k=dkey(l.t);counts[k]=(counts[k]||0)+1});
+  const days=[];const start=today-27*DAY-((new Date(today-27*DAY).getDay()+6)%7)*DAY;
+  for(let t=start;t<=today;t+=DAY)days.push(t);
+  const shade=n=>n===0?'#F0EADC':n===1?'#EED9A8':n===2?'#E2BC66':'#C8962E';
+  const daysWith=Object.keys(counts).filter(k=>days.some(d=>dkey(d)===k)).length;
+  const wc=weekCounts();
+  const thisMonth=real.filter(l=>new Date(l.t).getMonth()===new Date().getMonth()&&new Date(l.t).getFullYear()===new Date().getFullYear()).length;
+  const pm=new Date();pm.setDate(1);pm.setMonth(pm.getMonth()-1);
+  const lastMonth=real.filter(l=>new Date(l.t).getMonth()===pm.getMonth()&&new Date(l.t).getFullYear()===pm.getFullYear()).length;
+  const byG=Object.keys(G).map(g=>({g,n:real.filter(l=>l.g===g).length}));const mx=Math.max(1,...byG.map(x=>x.n));
+  const recent=S.logs.slice().sort((a,b)=>b.t-a.t).slice(0,15);
+  return '<h2>記録</h2><p class="sm muted" style="margin:-6px 2px 12px">比べる相手は、過去の自分だけ。</p>'+
+  '<div class="grid2" style="margin-bottom:12px"><div class="stat"><p class="sm muted">今週 / 先週</p><p class="n px">'+wc.now+' <span class="sm muted">/ '+wc.prev+'</span></p></div><div class="stat"><p class="sm muted">今月 / 先月</p><p class="n px">'+thisMonth+' <span class="sm muted">/ '+lastMonth+'</span></p></div></div>'+
+  '<div class="card"><p class="label">できた日に色がつく（直近4週で '+daysWith+'日）</p><div class="cal" style="margin-bottom:4px">'+['月','火','水','木','金','土','日'].map(w=>'<span class="sm muted" style="text-align:center">'+w+'</span>').join('')+'</div><div class="cal">'+days.map(d=>{const n=counts[dkey(d)]||0;return '<div style="background:'+shade(n)+';'+(d===today?'outline:2px solid var(--ink);':'')+(n>=3?'color:#fff':'')+'">'+new Date(d).getDate()+'</div>'}).join('')+'</div></div>'+
+  '<div class="card"><p class="label">ジャンル別の累計</p>'+byG.map(x=>'<div class="row" style="gap:8px;margin:6px 0"><span class="sm" style="width:58px">'+G[x.g].em+' '+G[x.g].name+'</span><div class="bar" style="flex:1"><i style="width:'+Math.round(x.n/mx*100)+'%;background:'+G[x.g].c+'"></i></div><span class="px sm" style="width:30px;text-align:right">'+x.n+'</span></div>').join('')+'</div>'+
+  '<div class="card"><p class="label">最近のできた</p>'+(recent.length?recent.map(l=>{const d=new Date(l.t);return '<div class="log"><span class="muted" style="width:62px;flex:none">'+(d.getMonth()+1)+'/'+d.getDate()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')+'</span><span style="flex:1">'+G[l.g].em+' '+esc(l.label)+'</span><span class="px sm" style="color:var(--gold)">+'+l.xp+'</span></div>'}).join(''):'<p class="sm muted">最初のできたを記録すると、ここに並びます。</p>')+'</div>';
+}
+
+function renderMe(){
+  const a=S.avatar;
+  return '<h2>自分</h2><div class="card" style="text-align:center">'+avatar(a,120)+'<p style="margin:8px 0 0;font-weight:700">'+esc(titleOf(S))+'</p><p class="sm muted" style="margin:0">'+esc(S.name)+'</p></div>'+
+  '<div class="card"><p class="label">肌</p><div class="opt">'+SKINS.map((c,i)=>'<button class="sw'+(a.skin===i?' on':'')+'" data-av="skin:'+i+'" style="background:'+c+'" aria-label="肌'+(i+1)+'"></button>').join('')+'</div>'+
+  '<p class="label">髪型</p><div class="opt">'+HAIRS.map(h=>'<button class="'+(a.hair===h.id?'on':'')+'" data-av="hair:'+h.id+'">'+h.name+'</button>').join('')+'</div>'+
+  '<p class="label">髪色</p><div class="opt">'+HAIRC.map((c,i)=>'<button class="sw'+(a.hc===i?' on':'')+'" data-av="hc:'+i+'" style="background:'+c+'" aria-label="髪色'+(i+1)+'"></button>').join('')+'</div>'+
+  '<p class="label">装備</p><div class="opt">'+OUTFITS.map(o=>{const ok=!o.ok||o.ok(S);return '<button class="'+(a.outfit===o.id?'on':'')+(ok?'':' locked')+'" data-av="outfit:'+o.id+'">'+(ok?'':'🔒 ')+o.name+'</button>'}).join('')+'</div>'+
+  '<p class="sm muted" style="margin:0">鍵つきの装備は、なりたい自分に近づくと解放されます。</p></div>'+
+  '<div class="card"><p class="label">名前</p><div class="row"><input type="text" id="nameTxt" value="'+esc(S.name)+'"><button class="ghost" data-act="saveName" style="flex:none">保存</button></div></div>'+
+  '<div class="card"><p class="label">体のゴール</p><div class="row"><input type="text" id="bodyTxt" value="'+esc(S.bodyGoal)+'"><button class="ghost" data-act="saveBody" style="flex:none">保存</button></div><p class="sm muted" style="margin:8px 0 0">体重はメイン画面に出さない方針です。</p></div>'+
+  '<div class="card"><p class="label">夜の見守り</p><div class="row" style="justify-content:space-between"><span class="sm">0:30〜2:00に開くと「2時の壁」をお知らせ</span><button class="ghost" data-act="night" style="flex:none">'+(S.night?'オン':'オフ')+'</button></div><button class="ghost" data-act="nightPreview" style="margin-top:8px;width:100%">お知らせをプレビュー</button><p class="sm muted" style="margin:8px 0 0">アプリを開いた時に表示されます。決まった時刻の通知は、iPhoneのリマインダーと組み合わせて届けます。</p></div>'+
+  '<div class="card"><p class="label">データとバックアップ</p><p class="sm muted" style="margin:0 0 8px">記録はこのiPhoneの中だけに保存されます。月に1回くらい、バックアップをファイルに保存しておくと安心です。'+(S.lastBackup?'<br>最後のバックアップ：'+new Date(S.lastBackup).toLocaleDateString('ja-JP'):'')+'</p><button class="ghost" data-act="backup" style="width:100%">バックアップを保存</button><button class="ghost" data-act="restore" style="width:100%;margin-top:8px">バックアップから復元</button><input type="file" id="restoreFile" accept="application/json,.json" style="display:none"><button class="ghost" data-act="reset" style="width:100%;margin-top:8px">最初からやり直す</button></div>';
+}
+
+function render(){
+  const app=document.getElementById('app');
+  app.innerHTML=tab==='home'?renderHome():tab==='quest'?renderQuest():tab==='log'?renderLog():renderMe();
+  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.tab===tab));
+}
+
+function openTimer(g){
+  g=g||'study';let start=null,iv=null;
+  const L=document.getElementById('layer');
+  const draw=()=>{
+    L.innerHTML='<div class="overlay"><div class="modal"><p class="label">2分だけ。終わってもいいし、続けてもいい。</p>'+
+    (start?'':'<div class="opt" style="justify-content:center">'+Object.keys(G).map(k=>'<button class="'+(k===g?'on':'')+'" data-tg="'+k+'">'+G[k].em+' '+G[k].name+'</button>').join('')+'</div>')+
+    '<div class="timer px" id="tm">2:00</div><p class="sm muted" id="tmsub" style="margin:0 0 12px">'+(start?'':'押した瞬間、もう勝ち')+'</p>'+
+    (start?'<button class="big" id="tfin">ここで終わる（できた）</button>':'<button class="big" id="tgo">スタート</button>')+
+    '<button class="ghost" id="tx" style="margin-top:8px;width:100%">'+(start?'記録せず閉じる':'閉じる')+'</button></div></div>';
+    L.querySelectorAll('[data-tg]').forEach(b=>b.onclick=()=>{g=b.dataset.tg;draw()});
+    const go=document.getElementById('tgo');if(go)go.onclick=()=>{start=Date.now();draw();iv=setInterval(tick,250);tick()};
+    const fin=document.getElementById('tfin');if(fin)fin.onclick=finish;
+    document.getElementById('tx').onclick=()=>{clearInterval(iv);L.innerHTML=''};
+  };
+  const tick=()=>{const e=(Date.now()-start)/1000;const tm=document.getElementById('tm'),sub=document.getElementById('tmsub'),fin=document.getElementById('tfin');if(!tm)return;
+    if(e<120){const r=Math.ceil(120-e);tm.textContent=Math.floor(r/60)+':'+String(r%60).padStart(2,'0');sub.textContent='途中で終わっても、ちゃんと「できた」';}
+    else{const x=Math.floor(e-120);tm.textContent='+'+Math.floor(x/60)+':'+String(x%60).padStart(2,'0');tm.style.color='var(--gold)';sub.textContent='2分達成。ここからはボーナスタイム';fin.textContent='終わる（できた！）'}};
+  const finish=()=>{clearInterval(iv);const e=(Date.now()-start)/1000;const min=Math.max(1,Math.round(e/60));
+    const xp=e<120?10:15+Math.min(30,Math.floor((e-120)/60)*2);
+    const tagMap={study:'java',body:'move',money:'money',heart:'metime',work:'career'};
+    L.innerHTML='';toast(e<120?'始めた時点で勝ち。':'2分の壁、突破。',xp);
+    addLog({g,label:'2分スタート（'+G[g].name+'・約'+min+'分）',tag:tagMap[g],xp});};
+  draw();
+}
+
+document.getElementById('nav').addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(!b)return;tab=b.dataset.tab;render();window.scrollTo(0,0)});
+document.getElementById('app').addEventListener('click',e=>{
+  const a=e.target.closest('[data-a]');
+  if(a){const act=S.actions.find(x=>x.id===a.dataset.a);if(!act)return;if(act.timer){openTimer(act.g);return}
+    const lim=act.lim;if(lim&&todayCount(act.id)>=lim){toast(pick(['今日はもう満タン。十分やってる。','この項目は今日の分クリア済み。']));return}
+    floatXP(a,10);addLog({a:act.id,g:act.g,label:act.label,tag:act.tag,xp:10});toast(act.tag==='notice'?pick(PRAISE_NOTICE):pick(PRAISE),10,true);return}
+  const f=e.target.closest('[data-f]');if(f){filter=f.dataset.f;render();return}
+  const tk=e.target.closest('[data-task]');if(tk){const id=tk.dataset.task;
+    if(S.done[id]){delete S.done[id];save();render();return}
+    S.done[id]=Date.now();let g='work',label='';for(const k in QUESTS)QUESTS[k].chapters.forEach(c=>c.tasks.forEach(t=>{if(t.id===id){g=k;label=t.t}}));
+    toast(pick(PRAISE),30);addLog({g,label,tag:'quest',xp:30});return}
+  const ge=e.target.closest('[data-goaledit]');if(ge){editGoals(ge.dataset.goaledit);return}
+  const gk=e.target.closest('[data-goalok]');if(gk){const [g,i]=gk.dataset.goalok.split(':');confirmGoal(g,+i);return}
+  const av=e.target.closest('[data-av]');if(av){const [k,v]=av.dataset.av.split(':');
+    if(k==='outfit'){const o=OUTFITS.find(x=>x.id===v);if(o.ok&&!o.ok(S)){toast('解放条件：'+o.need);return}}
+    S.avatar[k]=(k==='hair'||k==='outfit')?v:+v;save();render();return}
+  const b=e.target.closest('[data-act]');if(!b)return;const k=b.dataset.act;
+  if(k==='seed'){S=seed();save();render();toast('サンプルの20日分を入れました')}
+  if(k==='start'){const v=document.getElementById('startName').value.trim();if(!v){document.getElementById('startErr').textContent='名前を入れてください';return}S.name=v;S.started=true;save();render();toast('ようこそ、'+v)}
+  if(k==='backup'){const data=JSON.stringify(S);const blob=new Blob([data],{type:'application/json'});const d=new Date();const fname='life-rpg-backup-'+d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0')+'.json';try{const file=new File([blob],fname,{type:'application/json'});if(navigator.canShare&&navigator.canShare({files:[file]})){navigator.share({files:[file],title:'人生RPG バックアップ'}).then(()=>{S.lastBackup=Date.now();save();render();toast('バックアップを保存しました')}).catch(()=>{});return}}catch(err){}const u=URL.createObjectURL(blob);const a2=document.createElement('a');a2.href=u;a2.download='life-rpg-backup-'+d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0')+'.json';document.body.appendChild(a2);a2.click();a2.remove();setTimeout(()=>URL.revokeObjectURL(u),2000);S.lastBackup=Date.now();save();render();toast('バックアップを書き出しました')}
+  if(k==='restore'){document.getElementById('restoreFile').click()}
+  if(k==='timer')openTimer('study');
+  if(k==='editActs')actList();
+  if(k==='goquest'){tab='quest';render();window.scrollTo(0,0)}
+  if(k==='free'){const v=document.getElementById('freeTxt').value.trim();if(!v){toast('何ができたか、ひとことでOK');return}
+    floatXP(b,10);addLog({g:'heart',label:v,tag:'free',xp:10});toast(pick(PRAISE),10,true)}
+  if(k==='saveName'){const v=document.getElementById('nameTxt').value.trim();if(v){S.name=v;save();render();toast('保存しました')}}
+  if(k==='saveBody'){const v=document.getElementById('bodyTxt').value.trim();if(v){S.bodyGoal=v;QUESTS.body.title=v+'へ';save();render();toast('保存しました')}}
+  if(k==='night'){S.night=!S.night;save();render()}
+  if(k==='nightPreview'){modal(nightBanner(true).replace('class="night"','class="night" style="margin:0;text-align:left"'),null,'閉じる')}
+  if(k==='reset'){modal('<h3>最初からやり直しますか？</h3><p class="sm muted">記録とクエストの進み具合が消えます。</p><button class="ghost" id="rno" style="width:100%">やめておく</button>',()=>{S=fresh();save();tab='home';render()},'やり直す');
+    document.getElementById('rno').onclick=()=>{document.getElementById('layer').innerHTML=''}}
+});
+function actList(){
+  const L=document.getElementById('layer');
+  L.innerHTML='<div class="overlay"><div class="modal" style="text-align:left"><h3>できた項目の編集</h3><p class="sm muted" style="margin:0 0 8px">タップで編集。1日の上限もここで変えられます。</p>'+
+  S.actions.map(a=>'<div class="log" data-edit="'+a.id+'" style="cursor:pointer;align-items:center"><span style="font-size:20px">'+esc(a.em)+'</span><span style="flex:1">'+esc(a.label)+'<br><span class="sm muted">'+G[a.g].name+'・'+(a.timer?'タイマー':a.lim?'1日'+a.lim+'回まで':'上限なし')+'</span></span><span class="muted">›</span></div>').join('')+
+  '<button class="big" id="aadd" style="margin-top:12px">＋ 項目を追加</button><button class="ghost" id="aclose" style="margin-top:8px;width:100%">閉じる</button></div></div>';
+  L.querySelectorAll('[data-edit]').forEach(r=>r.onclick=()=>actForm(r.dataset.edit));
+  document.getElementById('aadd').onclick=()=>actForm(null);
+  document.getElementById('aclose').onclick=()=>{L.innerHTML='';render()};
+}
+function actForm(id){
+  const L=document.getElementById('layer');
+  const a=id?S.actions.find(x=>x.id===id):{em:'⭐',label:'',g:filter==='all'?'body':filter,lim:1};
+  let g=a.g,lim=a.lim;
+  const draw=()=>{
+    L.innerHTML='<div class="overlay"><div class="modal" style="text-align:left"><h3>'+(id?'項目を編集':'項目を追加')+'</h3>'+
+    '<p class="label" style="margin-top:8px">名前</p><input type="text" id="fl" value="'+esc(document.getElementById('fl')?document.getElementById('fl').value:a.label)+'" placeholder="プランクを30秒">'+
+    '<p class="label" style="margin-top:10px">絵文字</p><input type="text" id="fe" value="'+esc(document.getElementById('fe')?document.getElementById('fe').value:a.em)+'" style="width:80px">'+
+    '<p class="label" style="margin-top:10px">ジャンル</p><div class="opt">'+Object.keys(G).map(k=>'<button class="'+(k===g?'on':'')+'" data-fg="'+k+'">'+G[k].em+' '+G[k].name+'</button>').join('')+'</div>'+
+    (a.timer?'':'<p class="label">1日の上限</p><div class="opt">'+LIM_OPTS.map(n=>'<button class="'+(n===lim?'on':'')+'" data-fn="'+n+'">'+(n?n+'回':'なし')+'</button>').join('')+'</div>')+
+    '<p class="sm" id="ferr" style="color:#B3261E;margin:0;min-height:1em"></p>'+
+    '<button class="big" id="fsave" style="margin-top:6px">保存</button>'+(id&&!a.timer?'<button class="ghost" id="fdel" style="margin-top:8px;width:100%;color:#B3261E">この項目を削除</button>':'')+'<button class="ghost" id="fback" style="margin-top:8px;width:100%">戻る</button></div></div>';
+    L.querySelectorAll('[data-fg]').forEach(b=>b.onclick=()=>{g=b.dataset.fg;draw()});
+    L.querySelectorAll('[data-fn]').forEach(b=>b.onclick=()=>{lim=+b.dataset.fn;draw()});
+    document.getElementById('fl').oninput=()=>{document.getElementById('ferr').textContent=''};
+    document.getElementById('fback').onclick=actList;
+    document.getElementById('fsave').onclick=()=>{
+      const label=document.getElementById('fl').value.trim(),em=document.getElementById('fe').value.trim()||'⭐';
+      if(!label){document.getElementById('ferr').textContent='名前を入れてください';return}
+      if(id){Object.assign(a,{label,em,g,lim:a.timer?0:lim})}
+      else{const nid='c'+Date.now().toString(36);S.actions.push({id:nid,g,em,label,tag:'c_'+nid,lim})}
+      save();actList();toast('保存しました')};
+    const del=document.getElementById('fdel');
+    if(del)del.onclick=()=>{
+      const used=a.tag&&Object.values(QUESTS).some(q=>q.chapters.some(c=>c.tasks.some(t=>t.k===a.tag)));
+      L.innerHTML='<div class="overlay"><div class="modal"><h3>「'+esc(a.label)+'」を削除しますか？</h3><p class="sm muted">これまでの記録は残ります。'+(used?'この項目の回数で進むクエストは、進まなくなります。':'')+'</p><button class="big" id="dyes" style="margin-top:8px">削除する</button><button class="ghost" id="dno" style="margin-top:8px;width:100%">やめておく</button></div></div>';
+      document.getElementById('dno').onclick=()=>draw();
+      document.getElementById('dyes').onclick=()=>{S.actions=S.actions.filter(x=>x.id!==id);save();actList();toast('削除しました')};
+    };
+  };
+  draw();
+}
+function editGoals(g){
+  const L=document.getElementById('layer');const gl=goalsOf(g);
+  L.innerHTML='<div class="overlay"><div class="modal" style="text-align:left"><h3>'+G[g].em+' '+G[g].name+'の目標</h3><p class="sm muted" style="margin:0 0 10px">近いものから順に。段階3が「なりたい姿」です。</p>'+
+  gl.map((x,i)=>'<p class="label" style="margin-top:8px">'+STAGE_NAMES[i]+(i===2?'（なりたい姿）':'')+'</p><input type="text" id="gi'+i+'" value="'+esc(x.t)+'">').join('')+
+  '<p class="sm" id="gerr" style="color:#B3261E;margin:6px 0 0;min-height:1em"></p><button class="big" id="gsave" style="margin-top:6px">保存</button><button class="ghost" id="gcancel" style="margin-top:8px;width:100%">閉じる</button></div></div>';
+  [0,1,2].forEach(i=>document.getElementById('gi'+i).oninput=()=>{document.getElementById('gerr').textContent=''});
+  document.getElementById('gcancel').onclick=()=>{L.innerHTML=''};
+  document.getElementById('gsave').onclick=()=>{const v=[0,1,2].map(i=>document.getElementById('gi'+i).value.trim());
+    if(v.some(x=>!x)){document.getElementById('gerr').textContent='3つとも入れてください（ざっくりでOK）';return}
+    S.goals[g]=gl.map((x,i)=>Object.assign({},x,{t:v[i]}));save();L.innerHTML='';render();toast('目標を保存しました')};
+}
+function confirmGoal(g,i){
+  const L=document.getElementById('layer');const x=goalsOf(g)[i];
+  L.innerHTML='<div class="overlay"><div class="modal"><p class="label">'+G[g].em+' '+STAGE_NAMES[i]+'</p><h3>「'+esc(x.t)+'」を叶えた？</h3><button class="big" id="gyes" style="margin-top:10px">叶えた！</button><button class="ghost" id="gno" style="margin-top:8px;width:100%">まだ</button></div></div>';
+  document.getElementById('gno').onclick=()=>{L.innerHTML=''};
+  document.getElementById('gyes').onclick=()=>{S.goals[g][i]=Object.assign({},x,{d:Date.now()});L.innerHTML='';
+    save();const next=goalsOf(g)[i+1];
+    modal('<p class="px" style="font-size:13px;color:var(--gold);margin:0">STAGE CLEAR</p><div style="font-size:44px">🌟</div><h3>'+esc(x.t)+'</h3><p class="sm muted">ボーナス <span class="px" style="color:var(--gold)">+100 EXP</span></p>'+(next?'<p class="sm">次の目標：'+esc(next.t)+'</p>':'<p class="sm">なりたい姿に、たどり着いた。</p>'),()=>addLog({g,label:STAGE_NAMES[i]+'「'+x.t+'」を叶えた',tag:'goal',xp:100}));};
+}
+document.addEventListener('change',e=>{if(e.target.id!=='restoreFile')return;const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!d||!Array.isArray(d.logs))throw 0;
+  modal('<h3>このバックアップで上書きしますか？</h3><p class="sm muted">記録 '+d.logs.length+'件・今の記録は置き換わります。</p><button class="ghost" id="rsno" style="width:100%">やめておく</button>',()=>{S=d;if(!S.goals)S.goals=defaultGoals();if(!S.actions)S.actions=defaultActions();S.started=true;save();tab='home';render();toast('復元しました')},'復元する');
+  document.getElementById('rsno').onclick=()=>{document.getElementById('layer').innerHTML=''}}catch(err){toast('このファイルは読み込めませんでした')}};r.readAsText(f);e.target.value=''});
+if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{})})}
+if(navigator.storage&&navigator.storage.persist){navigator.storage.persist().catch(()=>{})}
+if(S.bodyGoal)QUESTS.body.title=S.bodyGoal+'へ';
+render();
+</script>
+</body>
+</html>
